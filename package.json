@@ -9,7 +9,7 @@
     "src"
   ],
   "bin": {
-    "sst-prune": "src/index.js"
+    "sst-stage-prune": "src/index.js"
   },
   "scripts": {
     "start": "node src/index.js",
