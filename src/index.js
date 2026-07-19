@@ -92,8 +92,8 @@ const stalePrStagesAction = async (options) => {
 };
 
 program
-  .name("sst-prune")
-  .description("Prune stale SST resources")
+  .name("sst-stage-prune")
+  .description("Prune stale SST stages")
   .action(stalePrStagesAction);
 
 addStalePrStageOptions(program);
