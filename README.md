@@ -1,6 +1,6 @@
-# sst-prune
+# sst-stage-prune
 
-`sst-prune` supports identifying and pruning SST Stages.
+`sst-stage-prune` supports identifying and pruning SST Stages.
 
 When PR environments are left behind, they create drag:
 
@@ -35,8 +35,8 @@ sdk-v2/provider2.go:572: sdk.helper_schema: creating CloudFront Function (thecar
 Run from the root of your SST project:
 
 ```bash
-sst-prune [options]
-sst-prune cleanup-pr-stages [options]
+sst-stage-prune [options]
+sst-stage-prune cleanup-pr-stages [options]
 ```
 
 You can also run locally in this repo with:
@@ -56,5 +56,5 @@ npm start -- [options]
 ## Example
 
 ```bash
-sst-prune cleanup-pr-stages --dry-run --pkg-mgr pnpm --sst-script sst
+sst-stage-prune cleanup-pr-stages --dry-run --pkg-mgr pnpm --sst-script sst
 ```
