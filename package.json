@@ -29,7 +29,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/klcodanr/sst-prune"
+    "url": "https://github.com/klcodanr/sst-stage-prune"
   },
   "dependencies": {
     "commander": "^14.0.3",
