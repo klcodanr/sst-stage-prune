@@ -30,6 +30,14 @@ sdk-v2/provider2.go:572: sdk.helper_schema: creating CloudFront Function (thecar
 - GitHub CLI (`gh`) installed and authenticated
 - An SST project with a runnable SST script (default script name: `sst`)
 
+## SST Versions
+
+This script should work with v3-4 of SST, however I've primarily verified it with v4.17.0 and v3.19.3. If you have any problems, [open an issue](https://github.com/klcodanr/sst-stage-prune/issues/new) and provide:
+
+- The SST version
+- What failed (ideally with the full console output)
+- The results of `npm run sst -- state list` or the equivalent command with your package manager
+
 ## Usage
 
 Run from the root of your SST project:
