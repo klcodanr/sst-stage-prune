@@ -76,16 +76,64 @@ export const getAppInfo = async ({ pkgMgr, sstScript }) => {
 };
 
 /**
+ * Determines whether an SST operation failed because its state is locked.
+ * SST reports a recommendation to run `sst unlock` on command stderr when
+ * execFile exits unsuccessfully.
+ *
+ * @param {unknown} error
+ */
+export const isStageLocked = (error) => {
+  const message = [error?.message, error?.stderr]
+    .filter((value) => typeof value === "string")
+    .join(" ");
+
+  return /\brun\s+[`"]?sst unlock\b/i.test(message);
+};
+
+/**
+ * Releases SST's lock for a stage.
  *
  * @param {string} stage
  * @param {import('../types.js').ScriptOptions} options
  */
-export const removeStage = async (stage, options) =>
+export const unlockStage = async (stage, options) =>
   run(
     options.pkgMgr,
-    ["run", options.sstScript, "--", "remove", "--stage", stage],
+    ["run", options.sstScript, "--", "unlock", "--stage", stage],
     {
       stdio: "inherit",
       streamLogs: true,
     },
   );
+
+/**
+ *
+ * @param {string} stage
+ * @param {import('../types.js').ScriptOptions} options
+ */
+export const removeStage = async (stage, options) => {
+  try {
+    return await run(
+      options.pkgMgr,
+      ["run", options.sstScript, "--", "remove", "--stage", stage],
+      {
+        stdio: "inherit",
+        streamLogs: true,
+      },
+    );
+  } catch (error) {
+    if (!isStageLocked(error)) {
+      throw error;
+    }
+
+    await unlockStage(stage, options);
+    return run(
+      options.pkgMgr,
+      ["run", options.sstScript, "--", "remove", "--stage", stage],
+      {
+        stdio: "inherit",
+        streamLogs: true,
+      },
+    );
+  }
+};

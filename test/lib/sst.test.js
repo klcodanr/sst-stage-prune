@@ -5,7 +5,12 @@ vi.mock("../../src/lib/run.js", () => ({
 }));
 
 import { run } from "../../src/lib/run.js";
-import { getAppInfo, removeStage } from "../../src/lib/sst.js";
+import {
+  getAppInfo,
+  isStageLocked,
+  removeStage,
+  unlockStage,
+} from "../../src/lib/sst.js";
 
 describe("getAppInfo", () => {
   beforeEach(() => {
@@ -85,6 +90,81 @@ describe("removeStage", () => {
         stdio: "inherit",
         streamLogs: true,
       },
+    );
+  });
+
+  it("unlocks a locked stage and retries removal", async () => {
+    vi.mocked(run)
+      .mockRejectedValueOnce(
+        Object.assign(new Error("command failed"), {
+          stderr:
+            "Locked A concurrent update was detected on the app. Run `sst unlock` to remove the lock and try again.",
+        }),
+      )
+      .mockResolvedValue({ stdout: "", stderr: "" });
+
+    await removeStage("PR-123", { pkgMgr: "yarn", sstScript: "my-sst" });
+
+    expect(run).toHaveBeenNthCalledWith(
+      1,
+      "yarn",
+      ["run", "my-sst", "--", "remove", "--stage", "PR-123"],
+      { stdio: "inherit", streamLogs: true },
+    );
+    expect(run).toHaveBeenNthCalledWith(
+      2,
+      "yarn",
+      ["run", "my-sst", "--", "unlock", "--stage", "PR-123"],
+      { stdio: "inherit", streamLogs: true },
+    );
+    expect(run).toHaveBeenNthCalledWith(
+      3,
+      "yarn",
+      ["run", "my-sst", "--", "remove", "--stage", "PR-123"],
+      { stdio: "inherit", streamLogs: true },
+    );
+  });
+
+  it("does not unlock for unrelated removal errors", async () => {
+    vi.mocked(run).mockRejectedValue(new Error("permission denied"));
+
+    await expect(
+      removeStage("PR-123", { pkgMgr: "npm", sstScript: "sst" }),
+    ).rejects.toThrow("permission denied");
+    expect(run).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("isStageLocked", () => {
+  it("detects lock errors in stderr", () => {
+    expect(
+      isStageLocked({
+        message: "command failed",
+        stderr:
+          "Locked A concurrent update was detected on the app. Run `sst unlock` to remove the lock and try again.",
+      }),
+    ).toBe(true);
+  });
+
+  it("ignores errors unrelated to a locked stage or state", () => {
+    expect(isStageLocked(new Error("permission denied"))).toBe(false);
+  });
+
+  it("ignores lock errors without SST's unlock recommendation", () => {
+    expect(isStageLocked({ stderr: "Locked resource" })).toBe(false);
+  });
+});
+
+describe("unlockStage", () => {
+  it("runs sst unlock for the selected stage", async () => {
+    vi.mocked(run).mockResolvedValue({ stdout: "", stderr: "" });
+
+    await unlockStage("PR-123", { pkgMgr: "pnpm", sstScript: "sst" });
+
+    expect(run).toHaveBeenCalledWith(
+      "pnpm",
+      ["run", "sst", "--", "unlock", "--stage", "PR-123"],
+      { stdio: "inherit", streamLogs: true },
     );
   });
 });
