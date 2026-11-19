@@ -87,7 +87,6 @@ describe("removeStage", () => {
       "yarn",
       ["run", "my-sst", "--", "remove", "--stage", "PR-123"],
       {
-        stdio: "inherit",
         streamLogs: true,
       },
     );
@@ -109,19 +108,19 @@ describe("removeStage", () => {
       1,
       "yarn",
       ["run", "my-sst", "--", "remove", "--stage", "PR-123"],
-      { stdio: "inherit", streamLogs: true },
+      { streamLogs: true },
     );
     expect(run).toHaveBeenNthCalledWith(
       2,
       "yarn",
       ["run", "my-sst", "--", "unlock", "--stage", "PR-123"],
-      { stdio: "inherit", streamLogs: true },
+      { streamLogs: true },
     );
     expect(run).toHaveBeenNthCalledWith(
       3,
       "yarn",
       ["run", "my-sst", "--", "remove", "--stage", "PR-123"],
-      { stdio: "inherit", streamLogs: true },
+      { streamLogs: true },
     );
   });
 
@@ -164,7 +163,7 @@ describe("unlockStage", () => {
     expect(run).toHaveBeenCalledWith(
       "pnpm",
       ["run", "sst", "--", "unlock", "--stage", "PR-123"],
-      { stdio: "inherit", streamLogs: true },
+      { streamLogs: true },
     );
   });
 });

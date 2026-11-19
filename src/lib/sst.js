@@ -101,7 +101,6 @@ export const unlockStage = async (stage, options) =>
     options.pkgMgr,
     ["run", options.sstScript, "--", "unlock", "--stage", stage],
     {
-      stdio: "inherit",
       streamLogs: true,
     },
   );
@@ -117,7 +116,6 @@ export const removeStage = async (stage, options) => {
       options.pkgMgr,
       ["run", options.sstScript, "--", "remove", "--stage", stage],
       {
-        stdio: "inherit",
         streamLogs: true,
       },
     );
@@ -131,7 +129,6 @@ export const removeStage = async (stage, options) => {
       options.pkgMgr,
       ["run", options.sstScript, "--", "remove", "--stage", stage],
       {
-        stdio: "inherit",
         streamLogs: true,
       },
     );

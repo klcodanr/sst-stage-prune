@@ -9,11 +9,14 @@ import { execFile } from "node:child_process";
  */
 export const run = (command, args, options = {}) => {
   return new Promise((resolve, reject) => {
+    const { streamLogs, ...execOptions } = options;
     const child = execFile(
       command,
       args,
       (error, stdout, stderr) => {
         if (error) {
+          error.stdout = stdout;
+          error.stderr = stderr;
           reject(error);
         } else {
           resolve({ stdout, stderr });
@@ -22,10 +25,10 @@ export const run = (command, args, options = {}) => {
       {
         encoding: "utf8",
         stdio: ["ignore", "pipe", "pipe"],
-        ...options,
+        ...execOptions,
       },
     );
-    if (options.streamLogs) {
+    if (streamLogs) {
       child.stdout.on("data", (data) => process.stdout.write(data.toString()));
       child.stderr.on("data", (data) => process.stderr.write(data.toString()));
     }
