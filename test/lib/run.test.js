@@ -49,7 +49,11 @@ describe("run", () => {
       };
     });
 
-    await expect(run("node", ["bad"])).rejects.toThrow("boom");
+    await expect(run("node", ["bad"])).rejects.toMatchObject({
+      message: "boom",
+      stdout: "",
+      stderr: "",
+    });
   });
 
   it("streams logs to process stdout and stderr when requested", async () => {
